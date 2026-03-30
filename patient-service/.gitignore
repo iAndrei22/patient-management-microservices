@@ -31,7 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-patient-service/mvnw
-patient-service/mvnw.cmd
-
