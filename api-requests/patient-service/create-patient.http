@@ -1,6 +1,7 @@
 ### Creates a new patient entity
-POST http://localhost:4000/patients
+POST http://lb-5cbf238c.elb.localhost.localstack.cloud:4004/api/patients
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "Andrei Andreescu Kafka",
