@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  ArrowUpDown,
   Building2,
   BarChart3,
+  ChevronDown,
+  ChevronUp,
   LogOut,
   Pencil,
   Plus,
@@ -70,6 +73,11 @@ const emptyUpdateForm = (): UpdateCustomerPayload => ({
 
 const navItems = [{ label: "Clients", icon: Users, active: true }] as const;
 
+const PAGE_SIZE = 10;
+
+type SortColumn = "name" | "email" | "address" | "dateOfBirth";
+type SortDirection = "asc" | "desc";
+
 export default function DashboardPage() {
   const router = useRouter();
   const { logout, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -86,6 +94,16 @@ export default function DashboardPage() {
   const [createForm, setCreateForm] = useState(emptyCreateForm);
   const [updateForm, setUpdateForm] = useState(emptyUpdateForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [columnFilters, setColumnFilters] = useState({
+    name: "",
+    email: "",
+    address: "",
+    dateOfBirth: "",
+  });
+  const [sortColumn, setSortColumn] = useState<SortColumn>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadCustomers = useCallback(async () => {
     setIsLoadingCustomers(true);
@@ -102,8 +120,62 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    loadCustomers();
+
+    const timeoutId = window.setTimeout(() => {
+      void loadCustomers();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [isAuthenticated, loadCustomers]);
+
+  const filteredCustomers = useMemo(() => {
+    const globalSearch = searchTerm.trim().toLowerCase();
+    const nameFilter = columnFilters.name.trim().toLowerCase();
+    const emailFilter = columnFilters.email.trim().toLowerCase();
+    const addressFilter = columnFilters.address.trim().toLowerCase();
+    const dobFilter = columnFilters.dateOfBirth.trim();
+
+    return customers.filter((customer) => {
+      const name = customer.name.toLowerCase();
+      const email = customer.email.toLowerCase();
+      const address = customer.address.toLowerCase();
+      const dob = customer.dateOfBirth ?? "";
+
+      const matchesGlobal =
+        !globalSearch ||
+        name.includes(globalSearch) ||
+        email.includes(globalSearch) ||
+        address.includes(globalSearch) ||
+        dob.includes(globalSearch);
+
+      const matchesColumns =
+        (!nameFilter || name.includes(nameFilter)) &&
+        (!emailFilter || email.includes(emailFilter)) &&
+        (!addressFilter || address.includes(addressFilter)) &&
+        (!dobFilter || dob.includes(dobFilter));
+
+      return matchesGlobal && matchesColumns;
+    });
+  }, [customers, searchTerm, columnFilters]);
+
+  const sortedCustomers = useMemo(() => {
+    const sorted = [...filteredCustomers];
+    sorted.sort((a, b) => {
+      const left = (a[sortColumn] ?? "").toLowerCase();
+      const right = (b[sortColumn] ?? "").toLowerCase();
+      const result = left.localeCompare(right);
+      return sortDirection === "asc" ? result : -result;
+    });
+    return sorted;
+  }, [filteredCustomers, sortColumn, sortDirection]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedCustomers.length / PAGE_SIZE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedCustomers = useMemo(() => {
+    const start = (safeCurrentPage - 1) * PAGE_SIZE;
+    return sortedCustomers.slice(start, start + PAGE_SIZE);
+  }, [sortedCustomers, safeCurrentPage]);
 
   function resetCreateForm() {
     setCreateForm(emptyCreateForm());
@@ -173,6 +245,49 @@ export default function DashboardPage() {
     } catch {
       setError("Failed to delete customer.");
     }
+  }
+
+  function setColumnFilter(
+    key: keyof typeof columnFilters,
+    value: string
+  ): void {
+    setColumnFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  }
+
+  function clearFilters(): void {
+    setSearchTerm("");
+    setColumnFilters({
+      name: "",
+      email: "",
+      address: "",
+      dateOfBirth: "",
+    });
+    setCurrentPage(1);
+  }
+
+  function toggleSort(column: SortColumn): void {
+    setCurrentPage(1);
+
+    if (sortColumn === column) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+      return;
+    }
+
+    setSortColumn(column);
+    setSortDirection("asc");
+  }
+
+  function renderSortIcon(column: SortColumn) {
+    if (sortColumn !== column) {
+      return <ArrowUpDown className="size-3.5 text-muted-foreground/70" />;
+    }
+
+    return sortDirection === "asc" ? (
+      <ChevronUp className="size-3.5 text-primary" />
+    ) : (
+      <ChevronDown className="size-3.5 text-primary" />
+    );
   }
 
   if (authLoading || !isAuthenticated) {
@@ -263,7 +378,7 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">
                 {isLoadingCustomers
                   ? "Loading..."
-                  : `${customers.length} ${customers.length === 1 ? "client" : "clients"}`}
+                  : `${sortedCustomers.length} of ${customers.length} ${customers.length === 1 ? "client" : "clients"}`}
               </p>
               <Button
                 type="button"
@@ -295,49 +410,70 @@ export default function DashboardPage() {
                     Create, view, update, and delete customers.
                   </CardDescription>
                 </div>
-                <Dialog
-                  open={addOpen}
-                  onOpenChange={(open) => {
-                    setAddOpen(open);
-                    if (!open) {
-                      resetCreateForm();
-                      setCreateError("");
-                    }
-                  }}
-                >
-                  <DialogTrigger
-                    render={
-                      <Button className="gap-2 shadow-sm" size="default" />
-                    }
-                  >
-                    <Plus className="size-4" />
-                    Add Customer
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Add Customer</DialogTitle>
-                      <DialogDescription>
-                        Create a new customer record.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleCreate} className="space-y-4">
-                      <CustomerFields
-                        values={createForm}
-                        onChange={setCreateForm}
-                      />
-                      {createError && (
-                        <p className="text-sm text-destructive" role="alert">
-                          {createError}
-                        </p>
-                      )}
-                      <DialogFooter>
-                        <Button type="submit" disabled={isSubmitting}>
-                          {isSubmitting ? "Saving..." : "Create"}
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:min-w-md">
+                  <Input
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    placeholder="Search customers (name, email, address, date)..."
+                    className="bg-background"
+                  />
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      type="button"
+                      onClick={clearFilters}
+                      disabled={!searchTerm && !Object.values(columnFilters).some(Boolean)}
+                    >
+                      Clear filters
+                    </Button>
+                    <Dialog
+                      open={addOpen}
+                      onOpenChange={(open) => {
+                        setAddOpen(open);
+                        if (!open) {
+                          resetCreateForm();
+                          setCreateError("");
+                        }
+                      }}
+                    >
+                      <DialogTrigger
+                        render={
+                          <Button className="gap-2 shadow-sm" size="default" />
+                        }
+                      >
+                        <Plus className="size-4" />
+                        Add Customer
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Add Customer</DialogTitle>
+                          <DialogDescription>
+                            Create a new customer record.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleCreate} className="space-y-4">
+                          <CustomerFields
+                            values={createForm}
+                            onChange={setCreateForm}
+                          />
+                          {createError && (
+                            <p className="text-sm text-destructive" role="alert">
+                              {createError}
+                            </p>
+                          )}
+                          <DialogFooter>
+                            <Button type="submit" disabled={isSubmitting}>
+                              {isSubmitting ? "Saving..." : "Create"}
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="p-0">
                 {isLoadingCustomers ? (
@@ -352,20 +488,104 @@ export default function DashboardPage() {
                       Add your first client using the button above.
                     </p>
                   </div>
+                ) : sortedCustomers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
+                    <Users className="size-10 text-muted-foreground/40" />
+                    <p className="text-sm font-medium">No matches found</p>
+                    <p className="text-sm text-muted-foreground">
+                      Try changing search text or clearing the filters.
+                    </p>
+                    <Button variant="outline" type="button" onClick={clearFilters}>
+                      Clear filters
+                    </Button>
+                  </div>
                 ) : (
                   <div className="overflow-hidden rounded-b-xl">
                     <Table>
                       <TableHeader>
                         <TableRow className="border-b border-border/80 bg-muted/50 hover:bg-muted/50">
-                          <TableHead>Name</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Address</TableHead>
-                          <TableHead>Date of birth</TableHead>
+                          <TableHead>
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-left"
+                              onClick={() => toggleSort("name")}
+                            >
+                              Name
+                              {renderSortIcon("name")}
+                            </button>
+                          </TableHead>
+                          <TableHead>
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-left"
+                              onClick={() => toggleSort("email")}
+                            >
+                              Email
+                              {renderSortIcon("email")}
+                            </button>
+                          </TableHead>
+                          <TableHead>
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-left"
+                              onClick={() => toggleSort("address")}
+                            >
+                              Address
+                              {renderSortIcon("address")}
+                            </button>
+                          </TableHead>
+                          <TableHead>
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 text-left"
+                              onClick={() => toggleSort("dateOfBirth")}
+                            >
+                              Date of birth
+                              {renderSortIcon("dateOfBirth")}
+                            </button>
+                          </TableHead>
                           <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                        <TableRow className="border-b border-border/70 bg-background hover:bg-background">
+                          <TableHead>
+                            <Input
+                              value={columnFilters.name}
+                              onChange={(e) => setColumnFilter("name", e.target.value)}
+                              placeholder="Filter name"
+                              className="h-8 bg-background"
+                            />
+                          </TableHead>
+                          <TableHead>
+                            <Input
+                              value={columnFilters.email}
+                              onChange={(e) => setColumnFilter("email", e.target.value)}
+                              placeholder="Filter email"
+                              className="h-8 bg-background"
+                            />
+                          </TableHead>
+                          <TableHead>
+                            <Input
+                              value={columnFilters.address}
+                              onChange={(e) => setColumnFilter("address", e.target.value)}
+                              placeholder="Filter address"
+                              className="h-8 bg-background"
+                            />
+                          </TableHead>
+                          <TableHead>
+                            <Input
+                              value={columnFilters.dateOfBirth}
+                              onChange={(e) =>
+                                setColumnFilter("dateOfBirth", e.target.value)
+                              }
+                              placeholder="YYYY-MM-DD"
+                              className="h-8 bg-background"
+                            />
+                          </TableHead>
+                          <TableHead />
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {customers.map((customer, index) => (
+                        {paginatedCustomers.map((customer, index) => (
                           <TableRow
                             key={customer.id}
                             className={cn(
@@ -419,6 +639,33 @@ export default function DashboardPage() {
                         ))}
                       </TableBody>
                     </Table>
+                    <div className="flex flex-col items-start justify-between gap-3 border-t border-border/70 bg-muted/30 px-4 py-3 text-sm sm:flex-row sm:items-center">
+                      <p className="text-muted-foreground">
+                        Page {safeCurrentPage} of {totalPages}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                          disabled={safeCurrentPage === 1}
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                          }
+                          disabled={safeCurrentPage === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </CardContent>

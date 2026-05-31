@@ -30,16 +30,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const lastRedirect = useRef<string | null>(null);
 
-  // Load token from localStorage once on mount
+  // Load token from localStorage once on mount, defer update to avoid sync setState-in-effect
   useEffect(() => {
-    try {
-      const saved = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
-      setToken(saved);
-    } catch (err) {
-      console.error("auth-context error reading localStorage", err);
-    } finally {
-      setIsLoading(false);
-    }
+    const id = window.setTimeout(() => {
+      try {
+        const saved = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
+        setToken(saved);
+      } catch (err) {
+        console.error("auth-context error reading localStorage", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(id);
   }, []);
 
   // Redirect handling — wait until we finished initial loading
@@ -49,8 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const p = pathname ?? "";
 
-      if (p.startsWith("/dashboard") && !token) {
-        // unauthenticated user trying to access dashboard -> send to login
+      // Do not redirect for internal Next.js routes or static files
+      const isInternal = p.startsWith("/_next") || p.startsWith("/static") || p.includes(".");
+
+      // If there's no token, only allow the login page (and internal/static paths).
+      if (!token && !isInternal && p !== "/login") {
         if (lastRedirect.current !== "/login") {
           lastRedirect.current = "/login";
           router.replace("/login");
@@ -58,8 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      // If authenticated and on the login page, send to dashboard.
       if (p === "/login" && token) {
-        // authenticated user on login -> send to dashboard
         if (lastRedirect.current !== "/dashboard") {
           lastRedirect.current = "/dashboard";
           router.replace("/dashboard");
