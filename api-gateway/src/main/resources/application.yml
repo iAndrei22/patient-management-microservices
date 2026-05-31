@@ -31,6 +31,15 @@ spring:
             - StripPrefix=1
             - JwtValidation
 
+        # Route for /api/analytics/** to analytics-service
+        - id: analytics-service-route
+          uri: http://analytics-service:4002
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
         # Route for /api/docs/customers to customer-service /v3/api-docs
         - id: api-docs-customer-route
           uri: http://customer-service:4000

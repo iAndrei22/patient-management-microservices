@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Building2,
+  BarChart3,
   LogOut,
   Pencil,
   Plus,
@@ -69,6 +71,7 @@ const emptyUpdateForm = (): UpdateCustomerPayload => ({
 const navItems = [{ label: "Clients", icon: Users, active: true }] as const;
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { logout, isAuthenticated, isLoading: authLoading } = useAuth();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
@@ -262,6 +265,15 @@ export default function DashboardPage() {
                   ? "Loading..."
                   : `${customers.length} ${customers.length === 1 ? "client" : "clients"}`}
               </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="gap-2"
+                onClick={() => router.push("/dashboard/reports")}
+              >
+                <BarChart3 className="size-4" />
+                View reports
+              </Button>
             </header>
 
             {error && (
@@ -367,7 +379,7 @@ export default function DashboardPage() {
                             <TableCell className="text-muted-foreground">
                               {customer.email}
                             </TableCell>
-                            <TableCell className="max-w-[200px] truncate text-muted-foreground">
+                            <TableCell className="max-w-50 truncate text-muted-foreground">
                               {customer.address}
                             </TableCell>
                             <TableCell className="text-muted-foreground">
