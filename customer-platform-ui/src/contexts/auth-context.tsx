@@ -56,8 +56,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Do not redirect for internal Next.js routes or static files
       const isInternal = p.startsWith("/_next") || p.startsWith("/static") || p.includes(".");
 
-      // If there's no token, only allow the login page (and internal/static paths).
-      if (!token && !isInternal && p !== "/login") {
+      // If there's no token, only allow auth entry pages (and internal/static paths).
+      const isPublicAuthPage = p === "/login" || p === "/register";
+      if (!token && !isInternal && !isPublicAuthPage) {
         if (lastRedirect.current !== "/login") {
           lastRedirect.current = "/login";
           router.replace("/login");

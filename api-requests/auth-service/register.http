@@ -1,0 +1,9 @@
+### Register a new user account
+POST http://localhost:4004/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@test.com",
+  "password": "password123"
+}
+
