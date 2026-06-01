@@ -1,9 +1,9 @@
 "use client";
 
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,9 +12,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PaymentsOverTime } from "@/types/analytics";
 
-export function PaymentsOverTimeChart({
+export function PaymentsVolumeChart({
   data,
-  emptyMessage = "No time-series data yet.",
+  emptyMessage = "No payment data available yet.",
 }: {
   data: PaymentsOverTime[];
   emptyMessage?: string;
@@ -22,34 +22,28 @@ export function PaymentsOverTimeChart({
   return (
     <Card className="border-border/70 shadow-sm">
       <CardHeader>
-        <CardTitle>Payments Over Time</CardTitle>
+        <CardTitle>Payment Volume</CardTitle>
       </CardHeader>
-      <CardContent className="h-90">
+      <CardContent className="h-85">
         {data.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
             {emptyMessage}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="periodLabel" tickMargin={8} minTickGap={16} />
-              <YAxis />
-              <Tooltip
-                formatter={(value: number | string, name: string) => [value, name]}
-              />
-              <Line
-                type="monotone"
-                dataKey="totalAmountCents"
-                stroke="#2563eb"
-                strokeWidth={3}
-                dot={false}
-              />
-            </LineChart>
+              <XAxis dataKey="periodLabel" tickMargin={8} minTickGap={18} />
+              <YAxis allowDecimals={false} />
+              <Tooltip formatter={(value: number, name: string) => [value, name]} />
+              <Bar dataKey="count" fill="#2563eb" radius={[8, 8, 0, 0]} />
+            </BarChart>
           </ResponsiveContainer>
         )}
       </CardContent>
     </Card>
   );
 }
+
+
 

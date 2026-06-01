@@ -32,6 +32,20 @@ To stop the full stack:
 docker compose down
 ```
 
+## Development
+
+- If you change a service's code or need to rebuild its image, redeploy only that service from the repo root:
+
+```powershell
+docker compose up -d --build --no-deps <service-name>
+```
+
+- If you only want to restart the existing service container, use:
+
+```powershell
+docker compose -f <service-folder>\docker-compose.yml restart
+```
+
 ## Run a service pair
 
 Start the database container first, then the service container.

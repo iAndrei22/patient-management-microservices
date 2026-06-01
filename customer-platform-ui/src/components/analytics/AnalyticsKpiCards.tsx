@@ -20,7 +20,7 @@ export function AnalyticsKpiCards({ summary }: { summary: AnalyticsSummary }) {
     },
     {
       label: "Average Payment",
-      value: summary.averagePaymentFormatted ?? "$0.00",
+      value: summary.averagePaymentFormatted ?? "RON 0.00",
       icon: ArrowUpRight,
       note: "Average ticket size",
     },
