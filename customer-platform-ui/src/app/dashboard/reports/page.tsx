@@ -10,6 +10,7 @@ import { PaymentsOverTimeChart } from "@/components/analytics/PaymentsOverTimeCh
 import { PaymentsVolumeChart } from "@/components/analytics/PaymentsVolumeChart";
 import { RecentPaymentsTable } from "@/components/analytics/RecentPaymentsTable";
 import { RevenueByServiceChart } from "@/components/analytics/RevenueByServiceChart";
+import { downloadReportAsPdf } from "@/components/analytics/ReportsPrintHelper";
 import {
   fetchAnalyticsSummary,
   fetchPaymentsOverTime,
@@ -164,7 +165,7 @@ export default function ReportsPage() {
 
   return (
     <div className="min-h-screen bg-muted/30 px-4 py-6 lg:px-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+      <div id="reports-root" className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
@@ -184,6 +185,13 @@ export default function ReportsPage() {
             >
               <ArrowLeft className="size-4" />
               Back to dashboard
+            </Button>
+            <Button
+              variant="default"
+              className="gap-2"
+              onClick={() => downloadReportAsPdf("reports-root")}
+            >
+              Export PDF
             </Button>
             <Button variant="outline" onClick={logout} className="gap-2">
               <LogOut className="size-4" />
