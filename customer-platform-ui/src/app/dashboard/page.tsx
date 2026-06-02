@@ -300,53 +300,53 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-muted/30">
-      {/* Sidebar */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-sidebar md:flex">
-        <div className="flex items-center gap-2.5 border-b border-sidebar-border px-5 py-5">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm shadow-primary/25">
-            <Building2 className="size-4" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-              Customer Platform
-            </p>
-            <p className="text-xs text-muted-foreground">Enterprise</p>
-          </div>
-        </div>
+       {/* Sidebar */}
+       <aside className="hidden w-60 shrink-0 flex-col border-r border-border/50 bg-sidebar md:flex shadow-sm">
+         <div className="flex items-center gap-2.5 border-b border-border/50 px-5 py-5 bg-gradient-to-br from-primary/5 to-accent/5">
+           <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-md shadow-primary/25">
+             <Building2 className="size-4" />
+           </div>
+           <div>
+             <p className="text-sm font-bold tracking-tight text-sidebar-foreground">
+               Customer Platform
+             </p>
+             <p className="text-xs text-muted-foreground">Enterprise</p>
+           </div>
+         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map(({ label, icon: Icon, active }) => (
-            <span
-              key={label}
-              className={cn(
-                "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/70"
-              )}
-            >
-              <Icon
-                className={cn(
-                  "size-4",
-                  active ? "text-primary" : "text-muted-foreground"
-                )}
-              />
-              {label}
-            </span>
-          ))}
-        </nav>
+         <nav className="flex-1 space-y-1 px-3 py-4">
+           {navItems.map(({ label, icon: Icon, active }) => (
+             <span
+               key={label}
+               className={cn(
+                 "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200",
+                 active
+                   ? "bg-gradient-to-r from-primary/15 to-accent/10 text-primary font-semibold"
+                   : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-primary/5"
+               )}
+             >
+               <Icon
+                 className={cn(
+                   "size-4",
+                   active ? "text-primary" : "text-muted-foreground"
+                 )}
+               />
+               {label}
+             </span>
+           ))}
+         </nav>
 
-        <div className="border-t border-sidebar-border p-3">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
-            onClick={logout}
-          >
-            <LogOut className="size-4" />
-            Log out
-          </Button>
-        </div>
-      </aside>
+         <div className="border-t border-border/50 p-3">
+           <Button
+             variant="ghost"
+             className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-primary/5 transition-all"
+             onClick={logout}
+           >
+             <LogOut className="size-4" />
+             Log out
+           </Button>
+         </div>
+       </aside>
 
       {/* Main content */}
       <div className="flex min-w-0 flex-1 flex-col">
@@ -366,26 +366,26 @@ export default function DashboardPage() {
 
         <main className="flex-1 overflow-auto p-6 lg:p-8">
           <div className="mx-auto max-w-6xl space-y-6">
-            <header className="animate-enter flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight">
-                  Clients
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Manage your customer records
-                </p>
-              </div>
+             <header className="animate-enter flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+               <div>
+                 <h1 className="text-3xl font-bold tracking-tight">
+                   Clients
+                 </h1>
+                 <p className="text-sm text-muted-foreground">
+                   Manage your customer records
+                 </p>
+               </div>
               <p className="text-sm text-muted-foreground">
                 {isLoadingCustomers
                   ? "Loading..."
                   : `${sortedCustomers.length} of ${customers.length} ${customers.length === 1 ? "client" : "clients"}`}
               </p>
-              <Button
-                type="button"
-                variant="outline"
-                className="gap-2"
-                onClick={() => router.push("/dashboard/reports")}
-              >
+               <Button
+                 type="button"
+                 variant="outline"
+                 className="gap-2 transition-all duration-200 border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                 onClick={() => router.push("/dashboard/reports")}
+               >
                 <BarChart3 className="size-4" />
                 View reports
               </Button>
@@ -400,12 +400,12 @@ export default function DashboardPage() {
               </p>
             )}
 
-            <Card className="animate-enter overflow-hidden border-border/80 py-0 shadow-md shadow-zinc-900/5 ring-1 ring-border/60 stagger-2">
-              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4 border-b border-border/60 bg-muted/30 px-6 py-5">
+            <Card className="animate-enter overflow-hidden border-border/60 py-0 shadow-md hover:shadow-lg transition-shadow duration-200 ring-1 ring-border/40 stagger-2">
+              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4 border-b border-border/40 bg-gradient-to-r from-primary/5 to-accent/5 px-6 py-5">
                 <div className="space-y-1">
-                  <CardTitle className="text-lg font-semibold">
-                    Customer directory
-                  </CardTitle>
+                   <CardTitle className="text-lg font-bold">
+                     Customer directory
+                   </CardTitle>
                   <CardDescription>
                     Create, view, update, and delete customers.
                   </CardDescription>
@@ -421,15 +421,16 @@ export default function DashboardPage() {
                     className="bg-background"
                   />
                   <div className="flex flex-wrap justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={clearFilters}
-                      disabled={!searchTerm && !Object.values(columnFilters).some(Boolean)}
-                    >
-                      Clear filters
-                    </Button>
-                    <Dialog
+                     <Button
+                       variant="outline"
+                       type="button"
+                       onClick={clearFilters}
+                       disabled={!searchTerm && !Object.values(columnFilters).some(Boolean)}
+                       className="transition-all duration-200 hover:border-primary/40 hover:bg-primary/5"
+                     >
+                       Clear filters
+                     </Button>
+                     <Dialog
                       open={addOpen}
                       onOpenChange={(open) => {
                         setAddOpen(open);
@@ -439,11 +440,11 @@ export default function DashboardPage() {
                         }
                       }}
                     >
-                      <DialogTrigger
-                        render={
-                          <Button className="gap-2 shadow-sm" size="default" />
-                        }
-                      >
+                       <DialogTrigger
+                         render={
+                           <Button className="gap-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all bg-gradient-to-r from-primary to-primary/80" size="default" />
+                         }
+                       >
                         <Plus className="size-4" />
                         Add Customer
                       </DialogTrigger>
@@ -503,8 +504,8 @@ export default function DashboardPage() {
                   <div className="overflow-hidden rounded-b-xl">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-b border-border/80 bg-muted/50 hover:bg-muted/50">
-                          <TableHead>
+                         <TableRow className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-accent/5 hover:bg-gradient-to-r hover:from-primary/8 hover:to-accent/8">
+                           <TableHead>
                             <button
                               type="button"
                               className="flex items-center gap-1 text-left"
@@ -546,8 +547,8 @@ export default function DashboardPage() {
                           </TableHead>
                           <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                        <TableRow className="border-b border-border/70 bg-background hover:bg-background">
-                          <TableHead>
+                        <TableRow className="border-b border-border/40 bg-card hover:bg-card/60">
+                           <TableHead>
                             <Input
                               value={columnFilters.name}
                               onChange={(e) => setColumnFilter("name", e.target.value)}
@@ -586,13 +587,13 @@ export default function DashboardPage() {
                       </TableHeader>
                       <TableBody>
                         {paginatedCustomers.map((customer, index) => (
-                          <TableRow
-                            key={customer.id}
-                            className={cn(
-                              "animate-enter",
-                              index < 8 && `stagger-${Math.min(index + 1, 5)}`
-                            )}
-                          >
+                           <TableRow
+                             key={customer.id}
+                             className={cn(
+                               "animate-enter border-border/30 hover:bg-accent/30 transition-colors duration-150",
+                               index < 8 && `stagger-${Math.min(index + 1, 5)}`
+                             )}
+                           >
                             <TableCell className="font-medium text-foreground">
                               {customer.name}
                             </TableCell>
@@ -606,41 +607,41 @@ export default function DashboardPage() {
                               {formatDisplayDate(customer.dateOfBirth)}
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openPaymentDialog(customer)}
-                                  className="gap-1.5"
-                                >
-                                  Generate Payment
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openEditDialog(customer)}
-                                  className="gap-1.5"
-                                >
-                                  <Pencil className="size-3.5" />
-                                  Edit
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => handleDelete(customer)}
-                                  className="gap-1.5"
-                                >
-                                  <Trash2 className="size-3.5" />
-                                  Delete
-                                </Button>
-                              </div>
-                            </TableCell>
+                               <div className="flex justify-end gap-1.5">
+                                 <Button
+                                   variant="outline"
+                                   size="sm"
+                                   onClick={() => openPaymentDialog(customer)}
+                                   className="gap-1.5 text-xs transition-all duration-200 border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                                 >
+                                   Generate Payment
+                                 </Button>
+                                 <Button
+                                   variant="outline"
+                                   size="sm"
+                                   onClick={() => openEditDialog(customer)}
+                                   className="gap-1.5 transition-all duration-200 border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                                 >
+                                   <Pencil className="size-3.5" />
+                                   Edit
+                                 </Button>
+                                 <Button
+                                   variant="destructive"
+                                   size="sm"
+                                   onClick={() => handleDelete(customer)}
+                                   className="gap-1.5 transition-all duration-200 hover:shadow-md hover:shadow-destructive/30"
+                                 >
+                                   <Trash2 className="size-3.5" />
+                                   Delete
+                                 </Button>
+                               </div>
+                             </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
-                    <div className="flex flex-col items-start justify-between gap-3 border-t border-border/70 bg-muted/30 px-4 py-3 text-sm sm:flex-row sm:items-center">
-                      <p className="text-muted-foreground">
+                    <div className="flex flex-col items-start justify-between gap-3 border-t border-border/40 bg-gradient-to-r from-primary/3 to-accent/3 px-4 py-3 text-sm sm:flex-row sm:items-center">
+                       <p className="text-muted-foreground">
                         Page {safeCurrentPage} of {totalPages}
                       </p>
                       <div className="flex items-center gap-2">

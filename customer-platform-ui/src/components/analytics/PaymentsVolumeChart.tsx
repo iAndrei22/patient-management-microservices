@@ -20,9 +20,9 @@ export function PaymentsVolumeChart({
   emptyMessage?: string;
 }) {
   return (
-    <Card className="border-border/70 shadow-sm">
-      <CardHeader>
-        <CardTitle>Payment Volume</CardTitle>
+    <Card className="border-border/60 shadow-md hover:shadow-lg transition-shadow ring-1 ring-border/40 overflow-hidden lg:col-span-2">
+      <CardHeader className="border-b border-border/40 bg-gradient-to-r from-primary/5 to-accent/5">
+         <CardTitle className="font-bold">Payment Volume</CardTitle>
       </CardHeader>
       <CardContent className="h-85">
         {data.length === 0 ? (

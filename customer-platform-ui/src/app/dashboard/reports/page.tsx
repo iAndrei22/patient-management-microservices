@@ -172,7 +172,7 @@ export default function ReportsPage() {
               <BarChart3 className="size-3.5" />
               Financial Analytics Dashboard
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight">Reports</h1>
+            <h1 className="text-4xl font-bold tracking-tight">Reports</h1>
             <p className="max-w-2xl text-sm text-muted-foreground">
               High-visibility, read-only payment analytics powered by Kafka-persisted events.
             </p>
@@ -180,7 +180,7 @@ export default function ReportsPage() {
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
-              className="gap-2"
+              className="gap-2 transition-all duration-200 border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
               onClick={() => router.push("/dashboard")}
             >
               <ArrowLeft className="size-4" />
@@ -188,25 +188,25 @@ export default function ReportsPage() {
             </Button>
             <Button
               variant="default"
-              className="gap-2"
+              className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all"
               onClick={() => downloadReportAsPdf("reports-root")}
             >
               Export PDF
             </Button>
-            <Button variant="outline" onClick={logout} className="gap-2">
+            <Button variant="outline" onClick={logout} className="gap-2 transition-all duration-200 border-primary/20 hover:border-primary/40 hover:bg-primary/5">
               <LogOut className="size-4" />
               Log out
             </Button>
-            <Button variant="outline" onClick={() => setRefreshTick((tick) => tick + 1)} className="gap-2">
+            <Button variant="outline" onClick={() => setRefreshTick((tick) => tick + 1)} className="gap-2 transition-all duration-200 border-primary/20 hover:border-primary/40 hover:bg-primary/5">
               <RefreshCw className="size-4" />
               Refresh
             </Button>
           </div>
         </div>
 
-        <Card className="border-border/70 shadow-sm">
-          <CardHeader className="border-b pb-4">
-            <CardTitle className="flex items-center gap-2 text-base">
+        <Card className="border-border/60 shadow-md hover:shadow-lg transition-shadow ring-1 ring-border/40">
+          <CardHeader className="border-b border-border/40 bg-gradient-to-r from-primary/5 to-accent/5 pb-4">
+            <CardTitle className="flex items-center gap-2 text-base font-bold">
               <CalendarRange className="size-4 text-primary" />
               Report controls
             </CardTitle>

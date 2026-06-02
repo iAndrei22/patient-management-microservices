@@ -21,9 +21,9 @@ export function RevenueByServiceChart({
   emptyMessage?: string;
 }) {
   return (
-    <Card className="border-border/70 shadow-sm">
-      <CardHeader>
-        <CardTitle>Revenue by Service Type</CardTitle>
+    <Card className="border-border/60 shadow-md hover:shadow-lg transition-shadow ring-1 ring-border/40 overflow-hidden">
+      <CardHeader className="border-b border-border/40 bg-gradient-to-r from-primary/5 to-accent/5">
+         <CardTitle className="font-bold">Revenue by Service Type</CardTitle>
       </CardHeader>
       <CardContent className="h-90">
         {data.length === 0 ? (
@@ -47,12 +47,12 @@ export function RevenueByServiceChart({
                   <Cell key={entry.serviceType} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip
-                formatter={(value: unknown, name: unknown, props: { payload?: RevenueByService }) => [
-                  props.payload?.amountFormatted ?? value,
-                  props.payload?.serviceType ?? name,
-                ]}
-              />
+               <Tooltip
+                 formatter={(value: unknown, name: unknown, props: any) => [
+                   (props.payload as RevenueByService)?.amountFormatted ?? value,
+                   (props.payload as RevenueByService)?.serviceType ?? name,
+                 ]}
+               />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
